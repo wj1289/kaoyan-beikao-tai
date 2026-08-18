@@ -1,0 +1,27 @@
+# render.yaml — 考研备考台 自托管推送后端 / PWA 一键部署（Render）
+#
+# 用法：
+#   1) 把整个仓库推到 GitHub。
+#   2) 在 Render 新建 "Blueprint"（蓝图）并连接该仓库，Render 会按本文件自动建服务。
+#   3) 部署完成后，打开 Render 提供的 https://xxx.onrender.com 即是用同一域名托管的 PWA + 后端。
+#
+# 零配置：VAPID 密钥在首次启动时由服务器自动生成并保存，
+#         无需在 Render 控制台手动填写任何密钥类环境变量。
+#         前端 PUSH_VAPID_PUBLIC_KEY 留空即可（自动从 /api/vapid 拉取）。
+
+services:
+  - type: web
+    name: kaoyan-beikao-tai
+    runtime: node
+    rootDir: .                       # 以仓库根为构建目录，server 与 考研备考台-pwa 都可访问（保证 sw.js 同源）
+    buildCommand: cd server && npm install
+    startCommand: cd server && node index.js
+    healthCheckPath: /api/vapid     # 健康检查：返回 200 即视为存活
+    envVars:
+      # 以下均为「可选」覆盖项；全部留默认即可直接部署，无需手动填写。
+      - key: NODE_VERSION
+        value: "18"
+      - key: VAPID_SUBJECT
+        value: "mailto:admin@example.com"   # 仅用于 VAPID 联系信息，可改成你的邮箱；非密钥
+      # PORT / VAPID_PUBLIC_KEY / VAPID_PRIVATE_KEY / STATE_DIR
+      #   由平台（PORT）或服务器的零配置逻辑（密钥）自动处理，请勿手动设置静态值。

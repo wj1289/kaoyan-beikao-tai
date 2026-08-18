@@ -1,0 +1,14 @@
+{
+  "name": "kaoyan-beikao-tai",
+  "version": "6.3.0",
+  "private": true,
+  "description": "考研备考台 — 自托管推送后端 + PWA 套件（支持 Render / Railway 一键部署）",
+  "scripts": {
+    "start": "node server/index.js",
+    "build": "cd server && npm install",
+    "gen-vapid": "node server/gen-vapid.js"
+  },
+  "engines": {
+    "node": ">=18"
+  }
+}

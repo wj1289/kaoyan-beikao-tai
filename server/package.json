@@ -1,0 +1,16 @@
+{
+  "name": "kaoyan-push-server",
+  "version": "1.0.0",
+  "private": true,
+  "description": "考研备考台 自托管推送后端：Web Push（跨设备真后台）+ 共享状态同步",
+  "type": "commonjs",
+  "main": "index.js",
+  "scripts": {
+    "start": "node index.js",
+    "gen-vapid": "node gen-vapid.js"
+  },
+  "dependencies": {
+    "express": "^4.19.2",
+    "web-push": "^3.6.7"
+  }
+}

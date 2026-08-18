@@ -1,0 +1,25 @@
+# railway.toml — 考研备考台 自托管推送后端 / PWA 一键部署（Railway）
+#
+# 用法：
+#   1) 把整个仓库推到 Git。
+#   2) 在 Railway 新建 Project 并连接该仓库，Railway 会按本文件自动构建部署。
+#   3) 部署完成后，打开 Railway 提供的 https://xxx.up.railway.app 即是用同一域名托管的 PWA + 后端。
+#
+# 零配置：VAPID 密钥首次启动自动生成并保存，无需在 Railway 控制台手动填写密钥。
+#         前端 PUSH_VAPID_PUBLIC_KEY 留空即可（自动从 /api/vapid 拉取）。
+
+[build]
+builder = "NIXPACKS"
+buildCommand = "cd server && npm install"
+watchPatterns = ["server/**"]
+
+[deploy]
+startCommand = "cd server && node index.js"
+healthcheckPath = "/api/vapid"
+healthcheckTimeout = 100
+restartPolicyType = "ON_FAILURE"
+restartPolicyMaxRetries = 10
+
+[deploy.env]
+NODE_VERSION = "18"
+VAPID_SUBJECT = "mailto:admin@example.com"

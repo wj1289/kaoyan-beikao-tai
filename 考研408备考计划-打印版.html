@@ -1,0 +1,83 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<title>考研408备考计划 · A4打印版</title>
+<style>
+  @page { size: A4; margin: 13mm; }
+  * { box-sizing: border-box; }
+  body { font-family: "Microsoft YaHei","PingFang SC",sans-serif; color:#1a1a1a; font-size:11px; line-height:1.5; margin:0; }
+  h1 { font-size:17px; margin:0 0 2px; }
+  h2 { font-size:13px; margin:9px 0 3px; border-left:4px solid #2b6cb0; padding-left:6px; }
+  .sub { color:#555; font-size:10px; margin-bottom:5px; }
+  table { width:100%; border-collapse:collapse; margin:3px 0; }
+  th,td { border:1px solid #bbb; padding:2.5px 5px; text-align:left; vertical-align:top; }
+  th { background:#eef4fb; font-weight:600; }
+  .grid { display:flex; gap:5px; flex-wrap:wrap; }
+  .card { flex:1 1 31%; border:1px solid #ccc; border-radius:5px; padding:4px 6px; min-width:31%; }
+  .m1{ border-top:3px solid #3182ce;} .m2{ border-top:3px solid #38a169;} .m3{ border-top:3px solid #d69e2e;} .m4{ border-top:3px solid #e53e3e;} .m5{ border-top:3px solid #805ad5;}
+  .card b { font-size:11px; }
+  .code { color:#c05621; font-weight:600; }
+  .feynman { color:#6b46c1; font-weight:600; }
+  ul { margin:2px 0 2px 15px; padding:0; }
+  li { margin:1px 0; }
+  .pb { page-break-inside: avoid; }
+  .kv { font-size:10px; }
+  .box { border:1px solid #ccc; border-radius:5px; padding:5px 8px; margin:3px 0; }
+  @media print { body { font-size:10.5px; } }
+</style>
+</head>
+<body>
+
+<h1>考研 408 备考计划（目标：过线 70+）· 贴墙版</h1>
+<div class="sub">2026-08-13 → 2026-12-20（约 4.5 个月 / 18 周）｜ 工作日 3h / 周末 5h ｜ 总可用约 460h</div>
+
+<div class="box kv pb">
+<b>分值与优先级</b>：数据结构 45（零基础·权重最高）｜ 计组 45（最难）｜ OS 35 ｜ 计网 25（后期集中记忆）。
+<b>方法</b>：三阶段(基础→强化→冲刺) ＋ 艾宾浩斯 ＋ 番茄钟 ＋ 二八法则 ＋ 费曼输出。
+<b>数据结构每周必做</b>：<span class="code">💻代码实现</span> ＋ <span class="feynman">🎤费曼输出</span>（周日 30–45min 讲给自己听）。
+</div>
+
+<h2>三阶段 · 五月度一览</h2>
+<div class="grid pb">
+  <div class="card m1"><b>M1 基础起步</b><br>8下–9月<br>线性表→二叉树(代码)；计组/OS框架；计网入门</div>
+  <div class="card m2"><b>M2 基础深化</b><br>9月<br>图/查找/排序(全代码)；存储+指令；同步+内存；网络层</div>
+  <div class="card m3"><b>M3 强化</b><br>10月<br>四科做题；算法大题；CPU/总线/IO；传输层+应用层</div>
+  <div class="card m4"><b>M4 综合强化</b><br>11上中旬<br>四科串联大题；计网记忆；早年真题摸底</div>
+  <div class="card m5"><b>M5 冲刺模考</b><br>11下–12中<br>限时真题≥3套；错题回看；计网冲刺；考前减量</div>
+</div>
+
+<h2>数据结构 · 每周代码💻 + 费曼🎤（重点）</h2>
+<table class="pb">
+<tr><th>周</th><th>日期</th><th>主题</th><th><span class="code">💻代码实现</span></th><th><span class="feynman">🎤费曼输出</span></th></tr>
+<tr><td>W1</td><td>8/17–23</td><td>线性表+栈队列</td><td>顺序表/链表增删改查；栈/循环队列</td><td>顺序表vs链表取舍，画存储图</td></tr>
+<tr><td>W2</td><td>8/24–30</td><td>树与二叉树基础</td><td>链式存储/建树；递归先中后序；层序BFS</td><td>三种遍历顺序差异，默写递归代码</td></tr>
+<tr><td>W3</td><td>8/31–9/6</td><td>二叉树进阶</td><td>非递归遍历；线索树；树↔二叉树；哈夫曼</td><td>非递归后序为何最难，讲清栈状态</td></tr>
+<tr><td>W4</td><td>9/7–13</td><td>查找树与平衡</td><td>二叉排序树；AVL四旋转；B/B+树</td><td>AVL为何保O(log n)，旋转本质</td></tr>
+<tr><td>W5</td><td>9/14–20</td><td>图基础</td><td>邻接矩阵/表建图；DFS/BFS</td><td>DFS vs BFS 场景，与树遍历关系</td></tr>
+<tr><td>W6</td><td>9/21–27</td><td>图进阶</td><td>Prim/Kruskal；Dijkstra/Floyd；拓扑</td><td>Prim vs Kruskal；Dijkstra为何不能负权</td></tr>
+<tr><td>W7</td><td>9/28–10/4</td><td>查找</td><td>顺序/折半；哈希表(开放定址/链地址)</td><td>哈希冲突来源，两种解决优劣</td></tr>
+<tr><td>W8</td><td>10/5–11</td><td>排序(全编码)</td><td>插/冒/快/归并/堆/希尔 全实现</td><td>快排vs归并；堆排为何不稳定</td></tr>
+<tr><td>W9</td><td>10/12–18</td><td>算法大题</td><td>二叉树路径/LCA/图应用/数组</td><td>大题讲成"输入→思路→代码→复杂度"</td></tr>
+<tr><td>W10+</td><td>11–12月</td><td>二刷+讲题</td><td>错题重做、大题手感</td><td>每周讲1–2道大题，写讲解笔记</td></tr>
+</table>
+
+<h2>每月里程碑（验收）</h2>
+<table class="pb">
+<tr><th>月</th><th>验收标准（勾选）</th></tr>
+<tr><td>M1</td><td>☐ 徒手写单链表插删/循环队列代码 ☐ 默写二叉树三遍历 ☐ 计组数据表示选择≥60% ☐ 四科框架笔记</td></tr>
+<tr><td>M2</td><td>☐ 写快排/归并/堆排+口述复杂度稳定性 ☐ 实现Dijkstra/Prim ☐ 计组存储选择≥65% ☐ OS信号量经典题推导</td></tr>
+<tr><td>M3</td><td>☐ 独立做5道算法大题 ☐ 计组CPU大题画通路/算CPI ☐ TCP握手/拥塞默写图解 ☐ 四科选择≥70%</td></tr>
+<tr><td>M4</td><td>☐ 完成第1套真题摸底+弱点清单 ☐ 计网五层对比表凭记忆画 ☐ 综合应用题每类≥2道</td></tr>
+<tr><td>M5</td><td>☐ 限时真题≥3套稳70+波动≤10 ☐ 错题本每题讲清 ☐ 考前夜凭记忆画四科框架</td></tr>
+</table>
+
+<h2>资料 + 节奏提醒</h2>
+<div class="box kv pb">
+<b>主资料</b>：王道《2027 数据结构/计组/OS/计网》四本 + 真题（零基础友好）。补充教材：严蔚敏(数据结构)、唐朔飞(计组)、汤小丹(OS)、谢希仁(计网)。
+<b>关键节点</b>：9月中旬考研大纲公布→对比微调；11月中旬起做真题摸底；12-20 考试(408 下午14:00–17:00)。
+<b>执行</b>：每天学完说"打卡"；每周日晚说"周报"。连续2天没学也别慌，恢复后完成率和没断过的人一样高。
+</div>
+
+</body>
+</html>
