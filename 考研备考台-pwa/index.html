@@ -289,6 +289,30 @@
   .fav-link{flex:1;color:var(--accent);text-decoration:none;font-size:14px;word-break:break-all;min-width:0}
   .fav-link .fav-cat{font-size:10.5px;color:var(--sub);margin-left:6px}
   .fav-del{color:var(--bad);cursor:pointer;font-size:15px}
+  /* 408 工作台 */
+  .kb-overview{display:grid;grid-template-columns:repeat(4,1fr);gap:8px;margin-bottom:12px}
+  .kb-stat{background:#fff;border:1px solid var(--line);border-radius:12px;padding:10px 4px;text-align:center}
+  .kb-stat b{display:block;font-size:20px;color:var(--accent);line-height:1.2}
+  .kb-stat span{font-size:11px;color:var(--sub)}
+  .kb-mastery{display:flex;gap:8px;margin-bottom:12px;flex-wrap:wrap}
+  .kb-mastery .chip{background:#fff;border:1px solid var(--line);border-radius:20px;padding:4px 12px;font-size:12px}
+  .kb-entries{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+  .kb-entry{background:#fafbff;border:1px solid var(--line);border-radius:12px;padding:10px}
+  .kb-entry-h{font-weight:600;margin-bottom:2px}
+  .kb-entry .inp{width:100%;margin-top:6px}
+  .kb-entry .btn{width:100%;margin-top:6px}
+  .kb-sub{margin-bottom:12px}
+  .kb-sub-h{font-weight:600;margin:4px 0 6px}
+  .kb-pt{display:flex;align-items:center;gap:8px;background:#fff;border:1px solid var(--line);border-radius:10px;padding:8px;margin-bottom:6px}
+  .kb-pt-main{flex:1;min-width:0}
+  .kb-pt-name{font-weight:500}
+  .kb-pt .sel{width:auto}
+  .kb-act{border:1px solid var(--line);border-radius:10px;padding:8px;margin-bottom:8px;background:#fff}
+  .kb-act-h{display:flex;justify-content:space-between;gap:8px;font-weight:500;align-items:baseline}
+  .kb-act .inp{width:100%;margin-top:6px}
+  .kb-practice{background:#fafbff;border:1px solid var(--line);border-radius:10px;padding:10px;margin-top:8px}
+  .kb-q-t{margin-top:6px;line-height:1.55}
+  @media(max-width:560px){ .kb-entries{grid-template-columns:1fr} .kb-overview{grid-template-columns:repeat(2,1fr)} }
 </style>
 </head>
 <body>
@@ -772,6 +796,7 @@
       <button data-wb="cal">📅 日程</button>
       <button data-wb="note">📝 笔记</button>
       <button data-wb="fav">🔖 书签</button>
+      <button data-wb="kb">🎓 408</button>
     </div>
 
     <!-- 待办清单 -->
@@ -866,6 +891,83 @@
         <div id="wb-fav-list"></div>
       </div>
     </div>
+
+    <!-- 408 辅导工作台 -->
+    <div id="wb-kb" style="display:none">
+      <!-- 状态概览 -->
+      <div class="kb-overview">
+        <div class="kb-stat"><b id="kb-stat-qa">0</b><span>技能调用</span></div>
+        <div class="kb-stat"><b id="kb-stat-pt">0</b><span>知识点</span></div>
+        <div class="kb-stat"><b id="kb-stat-due">0</b><span>今日待复习</span></div>
+        <div class="kb-stat"><b id="kb-stat-streak">0</b><span>连续天数</span></div>
+      </div>
+      <div class="kb-mastery" id="kb-mastery"></div>
+
+      <!-- 功能入口 -->
+      <div class="card">
+        <h2>🎯 技能功能入口</h2>
+        <div class="muted" style="margin-bottom:8px">点「调用技能」会复制规范提示词，去新对话粘贴给 408 专家即可执行（结果可回填归档）。</div>
+        <div class="kb-entries">
+          <div class="kb-entry">
+            <div class="kb-entry-h">🗣️ 费曼答疑</div>
+            <div class="muted">用自己的话讲 → 补漏 → 真题演练</div>
+            <input class="inp" id="kb-qa-q" placeholder="输入问题，如：简述 TCP 三次握手">
+            <button class="btn" id="kb-qa-go">调用技能（复制提示词）</button>
+          </div>
+          <div class="kb-entry">
+            <div class="kb-entry-h">🗺️ 知识索引</div>
+            <div class="muted">科目→章节→知识点→掌握度</div>
+            <input class="inp" id="kb-idx-focus" placeholder="本次关注考点（可选）">
+            <button class="btn" id="kb-idx-go">调用技能（复制提示词）</button>
+          </div>
+          <div class="kb-entry">
+            <div class="kb-entry-h">📊 定期归纳</div>
+            <div class="muted">聚类·关系图·薄弱点·复习表</div>
+            <button class="btn" id="kb-sum-go">调用技能（复制提示词）</button>
+          </div>
+          <div class="kb-entry">
+            <div class="kb-entry-h">⏰ 复习提醒</div>
+            <div class="muted">按艾宾浩斯列出今日待复习</div>
+            <button class="btn" id="kb-rem-go">调用技能（复制提示词）</button>
+          </div>
+        </div>
+      </div>
+
+      <!-- 快捷操作 -->
+      <div class="card">
+        <h2>⚡ 快捷操作</h2>
+        <div class="wb-tools">
+          <select class="sel" id="kb-pt-subj"></select>
+          <input class="inp" id="kb-pt-chapter" placeholder="章节，如：第5章 树与二叉树">
+        </div>
+        <div class="wb-tools">
+          <input class="inp" id="kb-pt-name" placeholder="知识点，如：二叉树遍历">
+          <select class="sel" id="kb-pt-mastery">
+            <option value="green">🟢 熟练</option>
+            <option value="yellow" selected>🟡 一般</option>
+            <option value="red">🔴 薄弱</option>
+          </select>
+          <button class="btn" id="kb-pt-add">＋ 记录知识点</button>
+        </div>
+        <div class="row" style="margin-top:8px">
+          <button class="btn sm" id="kb-practice">🎲 抽一道真题</button>
+          <button class="btn sm ghost" id="kb-review-all">✅ 标记今日复习完成</button>
+        </div>
+        <div id="kb-practice-box" class="kb-practice" style="display:none"></div>
+      </div>
+
+      <!-- 知识索引 -->
+      <div class="card">
+        <h2>🗺️ 知识索引</h2>
+        <div id="kb-index"></div>
+      </div>
+
+      <!-- 近期活动 -->
+      <div class="card">
+        <h2>🕑 近期活动</h2>
+        <div id="kb-activity"></div>
+      </div>
+    </div>
   </section>
 </div>
 
@@ -893,7 +995,7 @@ const KEY = "kaoyan_desk_v3";
 const SUBJ = { "408":"408","英1":"英语一","数1":"数学一","政":"政治","雅思":"雅思(IELTS)","软设":"软件设计师(中级)" };
 const MOODS = [["😀","状态好"],["🙂","还行"],["😐","一般"],["😟","疲惫"],["😫","崩溃"]];
 const DATABASE_ID = "sTbMez7pisPbkE0KhikPHl";
-const CHUNKS = ["meta","settings","checkins","notes","custom","plan_adj","cards","mistakes","exams","pdfs","pomo","todos","events","fav","quick"];
+const CHUNKS = ["meta","settings","checkins","notes","custom","plan_adj","cards","mistakes","exams","pdfs","pomo","todos","events","fav","quick","kb408"];
 const PLAN_SCHEMA = 4;  // 计划结构版本：变更 TEMPLATE/ROADMAP/SUBJ 或生成逻辑(缺口驱动/顺延)后自增 → 触发每周计划本地重建
 
 const ROADMAP = {
@@ -964,6 +1066,7 @@ function load(){
     if(!o.bookmarks) o.bookmarks=[];
     if(!o.bmCats) o.bmCats=["学习","工具","资讯","娱乐","其他"];
     if(typeof o.quick!=="string") o.quick="";
+    if(!o.kb408) o.kb408={points:[],activities:[],qaCount:0};
     if(!o.remind) o.remind={notify:false, auto:false};
     if(o.planSchema!==PLAN_SCHEMA){ o.plan={weekly:{}}; o.planSchema=PLAN_SCHEMA; }  // 计划结构变了 → 本地重建周计划
     return o; } } }catch(e){}
@@ -1000,6 +1103,7 @@ function defaultState(){
     bookmarks:[],
     bmCats:["学习","工具","资讯","娱乐","其他"],
     quick:"",
+    kb408:{points:[],activities:[],qaCount:0},
     remind:{notify:false, auto:false},
     certs:{ielts:false, csp:false, lanqiao:false, modeling:false, ruankao:false, pat:false, research:false},
     targets:{score:Object.assign({},DEFAULT_TARGETS.score), selfTest:Object.assign({},DEFAULT_TARGETS.selfTest)},
@@ -1768,12 +1872,13 @@ let _noteTimer=null;
 function wbUid(){ return Date.now().toString(36)+Math.random().toString(36).slice(2,7); }
 
 function renderWorkbench(){
-  ["todo","cal","note","fav"].forEach(function(s){ document.getElementById("wb-"+s).style.display=(s===WB_SUB)?"block":"none"; });
+  ["todo","cal","note","fav","kb"].forEach(function(s){ document.getElementById("wb-"+s).style.display=(s===WB_SUB)?"block":"none"; });
   document.querySelectorAll("#wb-subnav button").forEach(function(b){ b.classList.toggle("on", b.dataset.wb===WB_SUB); });
   if(WB_SUB==="todo") renderTodos();
   if(WB_SUB==="cal") paintCal();
   if(WB_SUB==="note"){ const ta=document.getElementById("wb-note-area"); if(ta){ ta.value=S.quick||""; document.getElementById("wb-note-count").textContent=(S.quick||"").length+" 字"; document.getElementById("wb-note-saved").textContent="已保存 ✓"; } }
   if(WB_SUB==="fav") renderFav();
+  if(WB_SUB==="kb") renderKb();
 }
 
 /* —— 待办清单 —— */
@@ -1966,6 +2071,203 @@ function bindWorkbench(){
   document.getElementById("wb-fav-add").onclick=addFav;
   document.getElementById("wb-fav-addcat").onclick=addCat;
   bindNote();
+  bindKb();
+}
+
+/* ============ 408 辅导工作台 ============ */
+const SUB408 = { DS:"数据结构", CO:"计算机组成原理", OS:"操作系统", CN:"计算机网络" };
+const KB_INTERVALS = [1,3,7,16,35]; // 艾宾浩斯 R1-R5
+const KB_QBANK = [
+  {subj:"DS", chapter:"第2章 线性表", q:"用快慢指针判断单链表是否有环，并说明如何找到环的入口节点。"},
+  {subj:"DS", chapter:"第5章 树与二叉树", q:"给定前序+中序遍历序列，如何唯一确定一棵二叉树？举例说明。"},
+  {subj:"CO", chapter:"第2章 数据的表示", q:"IEEE 754 单精度浮点数，阶码和尾数各几位？规格化数的绝对值范围如何确定？"},
+  {subj:"CO", chapter:"第4章 指令系统", q:"简述五段式流水线中数据冒险的三种类型及对应处理办法。"},
+  {subj:"OS", chapter:"第2章 进程管理", q:"用 PV 操作实现「生产者-消费者」问题，并说明互斥量与同步量的作用。"},
+  {subj:"OS", chapter:"第3章 内存管理", q:"比较分页与分段存储管理的区别，什么是快表（TLB）？"},
+  {subj:"CN", chapter:"第5章 传输层", q:"TCP 三次握手建立连接的过程，以及为什么需要三次而不是两次？"},
+  {subj:"CN", chapter:"第4章 网络层", q:"简述 IP 子网划分步骤，并计算给定 IP/26 的网络号与可用主机范围。"}
+];
+function kb(){ if(!S.kb408) S.kb408={points:[],activities:[],qaCount:0};
+  if(!S.kb408.points) S.kb408.points=[]; if(!S.kb408.activities) S.kb408.activities=[];
+  if(typeof S.kb408.qaCount!=="number") S.kb408.qaCount=0; return S.kb408; }
+function kbSave(){ save(); scheduleSync("kb408"); }
+function kbDueCount(){ const k=kb(), t=todayISO(); return (k.points||[]).filter(function(p){ return p.nextReview && p.nextReview<=t; }).length; }
+function kbStreak(){
+  const k=kb(); const set={}; (k.activities||[]).forEach(function(a){ const d=(a.ts||"").slice(0,10); if(d) set[d]=1; });
+  if(!Object.keys(set).length) return 0;
+  let cur=todayISO(); if(!set[cur]){ cur=addDays(cur,-1); if(!set[cur]) return 0; }
+  let s=0; while(set[cur]){ s++; cur=addDays(cur,-1); } return s;
+}
+function kbCopy(txt){
+  if(navigator.clipboard && window.isSecureContext){
+    navigator.clipboard.writeText(txt).then(function(){ toast("已复制提示词，去新对话粘贴给 408 专家 ▶"); },
+      function(){ kbCopyFallback(txt); });
+  } else kbCopyFallback(txt);
+}
+function kbCopyFallback(txt){
+  const ta=document.createElement("textarea"); ta.value=txt; ta.style.position="fixed"; ta.style.top="-9999px"; document.body.appendChild(ta); ta.focus(); ta.select();
+  try{ document.execCommand("copy"); toast("已复制提示词，去新对话粘贴给 408 专家 ▶"); }
+  catch(e){ window.prompt("复制以下提示词：", txt); }
+  document.body.removeChild(ta);
+}
+function addKbActivity(type,title,detail){
+  const k=kb(); k.activities=k.activities||[];
+  k.activities.unshift({id:wbUid(), ts:nowISO(), type:type, title:title, detail:detail||"", result:""});
+  if(k.activities.length>200) k.activities=k.activities.slice(0,200);
+  kbSave();
+}
+function renderKb(){
+  const k=kb();
+  document.getElementById("kb-stat-qa").textContent=k.qaCount||0;
+  document.getElementById("kb-stat-pt").textContent=(k.points||[]).length;
+  document.getElementById("kb-stat-due").textContent=kbDueCount();
+  document.getElementById("kb-stat-streak").textContent=kbStreak();
+  // 掌握度分布
+  const g=(k.points||[]).filter(function(p){return p.mastery==="green";}).length;
+  const y=(k.points||[]).filter(function(p){return p.mastery==="yellow";}).length;
+  const r=(k.points||[]).filter(function(p){return p.mastery==="red";}).length;
+  document.getElementById("kb-mastery").innerHTML=
+    '<span class="chip">🟢 熟练 '+g+'</span><span class="chip">🟡 一般 '+y+'</span><span class="chip">🔴 薄弱 '+r+'</span>';
+  // 科目下拉
+  const sel=document.getElementById("kb-pt-subj");
+  sel.innerHTML=Object.keys(SUB408).map(function(s){ return '<option value="'+s+'">'+SUB408[s]+'</option>'; }).join("");
+  renderKbIndex();
+  renderKbActivity();
+}
+function renderKbIndex(){
+  const k=kb(); const el=document.getElementById("kb-index");
+  const subs=Object.keys(SUB408); const bySub={}; subs.forEach(function(s){ bySub[s]=[]; });
+  (k.points||[]).forEach(function(p){ (bySub[p.subj]||(bySub[p.subj]=[])).push(p); });
+  let html="";
+  subs.forEach(function(s){
+    const pts=bySub[s]||[];
+    const dot = pts.length? (pts.every(function(p){return p.mastery==="green";})?"🟢":pts.some(function(p){return p.mastery==="red";})?"🔴":"🟡") : "⚪";
+    html+='<div class="kb-sub"><div class="kb-sub-h">'+dot+' '+SUB408[s]+' <span class="muted">('+pts.length+')</span></div>';
+    if(!pts.length){ html+='<div class="pdf-empty">暂无知识点，用上方「记录知识点」添加</div>'; }
+    else {
+      html+=pts.map(function(p){
+        const mc=p.mastery==="green"?"🟢":p.mastery==="red"?"🔴":"🟡";
+        const due = p.nextReview? (p.nextReview<=todayISO()?' · <b style="color:var(--bad)">待复习</b>':' · 下次 '+fmtDate(p.nextReview)) : "";
+        return '<div class="kb-pt" data-id="'+p.id+'">'
+          +'<div class="kb-pt-main"><div class="kb-pt-name">'+mc+' '+esc(p.name)+'</div>'
+          +'<div class="muted">'+esc(p.chapter||"")+due+'</div></div>'
+          +'<select class="sel sm" data-act="mastery">'
+          +'<option value="green"'+((p.mastery==="green")?" selected":"")+'>熟练</option>'
+          +'<option value="yellow"'+((p.mastery==="yellow")?" selected":"")+'>一般</option>'
+          +'<option value="red"'+((p.mastery==="red")?" selected":"")+'>薄弱</option></select>'
+          +'<button class="btn sm" data-act="review">复习</button>'
+          +'<button class="btn sm ghost" data-act="del">🗑</button></div>';
+      }).join("");
+    }
+    html+='</div>';
+  });
+  el.innerHTML=html;
+  el.querySelectorAll(".kb-pt").forEach(function(row){
+    const id=row.dataset.id;
+    row.querySelector('[data-act="mastery"]').onchange=function(){ const p=(kb().points||[]).filter(function(x){return x.id===id;})[0]; if(p){ p.mastery=this.value; kbSave(); renderKb(); } };
+    row.querySelector('[data-act="review"]').onclick=function(){ reviewKbPoint(id); };
+    row.querySelector('[data-act="del"]').onclick=function(){ delKbPoint(id); };
+  });
+}
+function addKbPoint(){
+  const subj=document.getElementById("kb-pt-subj").value;
+  const chapter=document.getElementById("kb-pt-chapter").value.trim();
+  const name=document.getElementById("kb-pt-name").value.trim();
+  const mastery=document.getElementById("kb-pt-mastery").value;
+  if(!name){ toast("请填写知识点"); return; }
+  const k=kb(); const created=todayISO();
+  k.points.push({id:wbUid(), subj:subj, chapter:chapter, name:name, mastery:mastery, created:created, lastReview:"", nextReview:addDays(created,1), reviews:0, note:""});
+  document.getElementById("kb-pt-name").value=""; document.getElementById("kb-pt-chapter").value="";
+  kbSave(); renderKb(); toast("已记录知识点");
+  addKbActivity("point","记录知识点："+name,"已加入知识索引");
+}
+function reviewKbPoint(id){
+  const k=kb(); const p=(k.points||[]).filter(function(x){return x.id===id;})[0]; if(!p) return;
+  const node=Math.min(p.reviews||0, KB_INTERVALS.length-1);
+  const interval=KB_INTERVALS[node];
+  p.lastReview=todayISO(); p.reviews=(p.reviews||0)+1; p.nextReview=addDays(todayISO(), interval);
+  addKbActivity("review","复习："+p.name,"节点 R"+p.reviews+"（+"+interval+"天）");
+  kbSave(); renderKb(); toast("已标记复习，下次 "+fmtDate(p.nextReview));
+}
+function delKbPoint(id){ S.kb408.points=(S.kb408.points||[]).filter(function(x){return x.id!==id;}); kbSave(); renderKb(); }
+function kbReviewAll(){
+  const k=kb(); const t=todayISO();
+  const due=(k.points||[]).filter(function(p){ return p.nextReview && p.nextReview<=t; });
+  if(!due.length){ toast("今天没有待复习的知识点 👍"); return; }
+  due.forEach(function(p){ const node=Math.min(p.reviews||0, KB_INTERVALS.length-1); p.lastReview=todayISO(); p.reviews=(p.reviews||0)+1; p.nextReview=addDays(todayISO(), KB_INTERVALS[node]); });
+  addKbActivity("review","批量复习 "+due.length+" 个知识点","已标记今日复习完成");
+  kbSave(); renderKb(); toast("已标记 "+due.length+" 个知识点复习完成");
+}
+function invokeKb(type){
+  let q="", prompt="", title="";
+  if(type==="qa"){
+    q=document.getElementById("kb-qa-q").value.trim();
+    title = q? ("答疑："+q) : "费曼答疑（未填写问题）";
+    prompt="【408·费曼答疑】请就以下问题用费曼学习法辅导我："+(q||"（请在此补充你的具体问题）")+"。\n请严格按技能工作流：①先让我用自己的话解释；②只补漏我卡壳的部分，引用课件章节与历年真题；③给出真题演练；④标注该知识点复习节点（艾宾浩斯 R1-R5：1/3/7/16/35 天）。";
+    if(q){ kb().qaCount++; }
+  } else if(type==="idx"){
+    q=document.getElementById("kb-idx-focus").value.trim();
+    title="知识索引更新";
+    prompt="【408·知识索引】请基于我最近的 408 学习，帮我梳理并更新知识索引（科目→章节→知识点→掌握度+最近复习+关联真题）。当前我关注："+(q||"（请补充本次关注的考点）")+"。";
+  } else if(type==="sum"){
+    title="定期归纳";
+    prompt="【408·定期归纳】请对我近期的 408 学习做一轮归纳：①按 数据结构/计组/操作系统/计网 聚类知识点；②绘制知识关系图；③诊断薄弱点并推荐复习路径；④给出按艾宾浩斯曲线的复习时间表。";
+  } else if(type==="rem"){
+    title="复习提醒";
+    prompt="【408·复习提醒】请根据我的知识索引，列出今天到达复习节点（R1/R3/R5）的知识点，并给出建议的复习方式。";
+  }
+  kbCopy(prompt);
+  addKbActivity(type, title, "提示词已复制，去新对话粘贴给 408 专家执行。");
+  if(type==="qa" && q) renderKb();
+}
+function kbPractice(){
+  const item=KB_QBANK[Math.floor(Math.random()*KB_QBANK.length)];
+  const box=document.getElementById("kb-practice-box");
+  box.style.display="block";
+  box.innerHTML='<div class="kb-q"><b>🎲 '+SUB408[item.subj]+' · '+esc(item.chapter)+'</b>'
+    +'<div class="kb-q-t">'+esc(item.q)+'</div>'
+    +'<div class="row" style="margin-top:8px"><button class="btn sm" id="kb-q-go">调用技能解析</button><button class="btn sm ghost" id="kb-q-close">收起</button></div></div>';
+  document.getElementById("kb-q-go").onclick=function(){
+    const prompt="【408·费曼答疑·真题】请就以下题目用费曼法辅导我：\n"+item.q+"\n所属："+SUB408[item.subj]+" "+item.chapter+"\n请先让我讲思路，再补漏并给出标准答法。";
+    kbCopy(prompt);
+    addKbActivity("practice","真题演练："+item.q.slice(0,18)+"...","提示词已复制，去新对话粘贴给 408 专家执行。");
+    renderKb();
+  };
+  document.getElementById("kb-q-close").onclick=function(){ box.style.display="none"; };
+}
+function renderKbActivity(){
+  const k=kb(); const el=document.getElementById("kb-activity");
+  const arr=(k.activities||[]).slice().sort(function(a,b){ return (b.ts||"").localeCompare(a.ts||""); });
+  if(!arr.length){ el.innerHTML='<div class="pdf-empty">暂无活动，调用技能或记录知识点后会出现在这里</div>'; return; }
+  const icon={qa:"🗣️",idx:"🗺️",sum:"📊",rem:"⏰",review:"✅",practice:"🎲",point:"📌"};
+  el.innerHTML=arr.map(function(a){
+    const t=(a.ts||"").replace("T"," ").slice(0,16);
+    return '<div class="kb-act" data-id="'+a.id+'">'
+      +'<div class="kb-act-h"><span>'+(icon[a.type]||"•")+' '+esc(a.title)+'</span><span class="muted">'+t+'</span></div>'
+      +(a.detail?'<div class="muted">'+esc(a.detail)+'</div>':'')
+      +'<textarea class="inp kb-act-res" rows="2" placeholder="粘贴 / 记录 AI 的回答结果…">'+esc(a.result||"")+'</textarea>'
+      +'<div class="row" style="margin-top:4px"><button class="btn sm" data-act="saveres">保存结果</button><button class="btn sm ghost" data-act="del">删除</button></div>'
+      +'</div>';
+  }).join("");
+  el.querySelectorAll(".kb-act").forEach(function(card){
+    const id=card.dataset.id;
+    card.querySelector('[data-act="saveres"]').onclick=function(){
+      const ta=card.querySelector(".kb-act-res"); const a=(kb().activities||[]).filter(function(x){return x.id===id;})[0];
+      if(a){ a.result=ta.value; kbSave(); toast("已保存结果"); }
+    };
+    card.querySelector('[data-act="del"]').onclick=function(){
+      S.kb408.activities=(S.kb408.activities||[]).filter(function(x){return x.id!==id;}); kbSave(); renderKb();
+    };
+  });
+}
+function bindKb(){
+  document.getElementById("kb-pt-add").onclick=addKbPoint;
+  document.getElementById("kb-qa-go").onclick=function(){ invokeKb("qa"); };
+  document.getElementById("kb-idx-go").onclick=function(){ invokeKb("idx"); };
+  document.getElementById("kb-sum-go").onclick=function(){ invokeKb("sum"); };
+  document.getElementById("kb-rem-go").onclick=function(){ invokeKb("rem"); };
+  document.getElementById("kb-practice").onclick=kbPractice;
+  document.getElementById("kb-review-all").onclick=kbReviewAll;
 }
 
 /* ============ tab 切换 ============ */
@@ -2043,16 +2345,16 @@ function importData(file){
   const rd=new FileReader();
   rd.onload=function(){ try{ const o=JSON.parse(rd.result);
     if(o&&o.settings&&o.checkins){ S=o; if(!S.plan)S.plan={weekly:{}}; if(!S.certs)S.certs={}; if(!S.notes)S.notes={}; if(!S.custom)S.custom={}; if(!S.cards)S.cards=[]; if(!S.mistakes)S.mistakes=[]; if(!S.exams)S.exams=[]; if(!S.pdfs)S.pdfs=[]; if(!S.todos)S.todos=[]; if(!S.events)S.events=[]; if(!S.bookmarks)S.bookmarks=[]; if(!S.bmCats)S.bmCats=["学习","工具","资讯","娱乐","其他"]; if(typeof S.quick!=="string")S.quick=""; if(!S.remind)S.remind={notify:false,auto:false};
-      save(); renderAll(); toast("已恢复备份"); scheduleSync("checkins"); scheduleSync("notes"); scheduleSync("custom"); scheduleSync("settings"); scheduleSync("plan_adj"); scheduleSync("cards"); scheduleSync("mistakes"); scheduleSync("exams"); scheduleSync("pdfs"); scheduleSync("pomo"); scheduleSync("todos"); scheduleSync("events"); scheduleSync("fav"); scheduleSync("quick"); } else toast("文件格式不对"); }catch(e){ toast("解析失败"); } };
+      save(); renderAll(); toast("已恢复备份"); scheduleSync("checkins"); scheduleSync("notes"); scheduleSync("custom"); scheduleSync("settings"); scheduleSync("plan_adj"); scheduleSync("cards"); scheduleSync("mistakes"); scheduleSync("exams"); scheduleSync("pdfs"); scheduleSync("pomo"); scheduleSync("todos"); scheduleSync("events"); scheduleSync("fav"); scheduleSync("quick"); scheduleSync("kb408"); } else toast("文件格式不对"); }catch(e){ toast("解析失败"); } };
   rd.readAsText(file);
 }
 function clearSample(){
   if(!confirm("确定清空所有打卡/笔记数据（仅保留设置与背景）？此操作不可撤销。")) return;
   try{ localStorage.removeItem("desk_recids"); }catch(e){}
   S={settings:S.settings, background:S.background, certs:S.certs, targets:S.targets, remind:S.remind||{notify:false,auto:false},
-     cards:S.cards||[], mistakes:S.mistakes||[], exams:S.exams||[], pdfs:S.pdfs||[], pomo:S.pomo||{focus:25,short:5,long:15,rounds:4,done:0}, todos:S.todos||[], events:S.events||[], bookmarks:S.bookmarks||[], bmCats:S.bmCats||["学习","工具","资讯","娱乐","其他"], quick:S.quick||"", plan:{weekly:{}}, custom:{}, version:3, seeded:false};
+     cards:S.cards||[], mistakes:S.mistakes||[], exams:S.exams||[], pdfs:S.pdfs||[], pomo:S.pomo||{focus:25,short:5,long:15,rounds:4,done:0}, todos:S.todos||[], events:S.events||[], bookmarks:S.bookmarks||[], bmCats:S.bmCats||["学习","工具","资讯","娱乐","其他"], quick:S.quick||"", kb408:S.kb408||{points:[],activities:[],qaCount:0}, plan:{weekly:{}}, custom:{}, version:3, seeded:false};
   save(); renderAll(); toast("已清空打卡数据（卡片/错题/模考/PDF/工作台已保留）");
-  scheduleSync("checkins"); scheduleSync("notes"); scheduleSync("custom"); scheduleSync("settings"); scheduleSync("plan_adj"); scheduleSync("cards"); scheduleSync("mistakes"); scheduleSync("exams"); scheduleSync("pdfs"); scheduleSync("pomo"); scheduleSync("todos"); scheduleSync("events"); scheduleSync("fav"); scheduleSync("quick");
+  scheduleSync("checkins"); scheduleSync("notes"); scheduleSync("custom"); scheduleSync("settings"); scheduleSync("plan_adj"); scheduleSync("cards"); scheduleSync("mistakes"); scheduleSync("exams"); scheduleSync("pdfs"); scheduleSync("pomo"); scheduleSync("todos"); scheduleSync("events"); scheduleSync("fav"); scheduleSync("quick"); scheduleSync("kb408");
 }
 
 /* ============ 云端同步引擎 ============ */
@@ -2086,6 +2388,7 @@ function chunkOf(name){
   if(name==="events") return S.events||[];
   if(name==="fav") return {bookmarks:S.bookmarks||[], cats:S.bmCats||[]};
   if(name==="quick") return (typeof S.quick==="string")?S.quick:"";
+  if(name==="kb408") return S.kb408||{points:[],activities:[],qaCount:0};
   return {};
 }
 function applyChunk(name,obj){
@@ -2110,6 +2413,7 @@ function applyChunk(name,obj){
   else if(name==="events"){ if(Array.isArray(obj)) S.events=obj; }
   else if(name==="fav"){ if(obj){ if(Array.isArray(obj.bookmarks)) S.bookmarks=obj.bookmarks; if(Array.isArray(obj.cats)) S.bmCats=obj.cats; } }
   else if(name==="quick"){ if(typeof obj==="string") S.quick=obj; }
+  else if(name==="kb408"){ if(obj && typeof obj==="object") S.kb408=obj; }
 }
 function pushOne(name,obj){
   const full={ "value":{text:JSON.stringify(obj)}, "rev":{number:REV}, "updatedAt":{date:nowISO()}, "clientId":{text:DEVICE_ID} };
