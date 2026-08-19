@@ -32,8 +32,8 @@
   .itip{background:#eef3ff;color:#3a5bbf;font-size:12.5px;padding:9px 12px;display:flex;align-items:center;gap:8px;justify-content:space-between}
   .itip.hidden{display:none} .itip .btn{padding:4px 10px;font-size:11.5px}
   nav{position:fixed;bottom:0;left:0;right:0;z-index:30;display:flex;background:#fff;border-top:1px solid var(--line);
-    max-width:760px;margin:0 auto}
-  nav a{flex:1;text-align:center;padding:6px 0 8px;font-size:10.5px;color:var(--sub);text-decoration:none}
+    max-width:760px;margin:0 auto;overflow-x:auto;-webkit-overflow-scrolling:touch}
+  nav a{flex:1 0 auto;min-width:60px;text-align:center;padding:6px 0 8px;font-size:10.5px;color:var(--sub);text-decoration:none}
   nav a .ic{font-size:18px;display:block;line-height:1.1}
   nav a.on{color:var(--accent)}
   nav a.on .ic{transform:translateY(-1px)}
@@ -206,12 +206,37 @@
   .pdf-empty{text-align:center;color:var(--sub);padding:24px 0}
   .pdf-progress{height:6px;border-radius:4px;background:#eef1f7;overflow:hidden;margin-top:8px}
   .pdf-progress i{display:block;height:100%;background:var(--accent);width:0%;transition:.2s}
+
+  /* ===== 考研倒计时 ===== */
+  .cd-live{font-size:12px;color:#3a6db5;font-weight:700;letter-spacing:.3px;margin-top:2px;font-variant-numeric:tabular-nums}
+  .countdown-hero{text-align:center;background:linear-gradient(135deg,#eef3ff,#f7f0ff);border-color:#d8e2fb}
+  .countdown-hero .cd-top{display:flex;justify-content:space-between;align-items:center;font-size:13px}
+  .countdown-hero .cd-num{font-size:46px;font-weight:800;color:var(--accent);line-height:1.1;margin:6px 0 2px;font-variant-numeric:tabular-nums}
+  .countdown-hero .cd-num i{font-size:16px;font-style:normal;color:var(--sub);font-weight:600;margin-left:4px}
+  .countdown-hero .cd-hms{font-size:22px;font-weight:700;color:var(--ink);font-variant-numeric:tabular-nums;letter-spacing:1px}
+  .countdown-hero .cd-bar{margin-top:8px;font-size:12px;color:var(--sub)}
+  .countdown-hero .cd-actions{margin-top:10px}
+
+  /* ===== 番茄专注 ===== */
+  .pomo-card{text-align:center}
+  .pomo-wrap{display:flex;justify-content:center;margin:14px 0 6px}
+  .pomo-ring{width:190px;height:190px;border-radius:50%;background:conic-gradient(var(--accent) 360deg,#eef1f7 0deg);display:flex;align-items:center;justify-content:center}
+  .pomo-inner{width:158px;height:158px;border-radius:50%;background:#fff;display:flex;align-items:center;justify-content:center;box-shadow:0 2px 10px rgba(0,0,0,.06)}
+  .pomo-time{font-size:44px;font-weight:800;color:var(--ink);font-variant-numeric:tabular-nums}
+  .pomo-ctrl{display:flex;gap:10px;justify-content:center;margin:6px 0 4px}
+  .pomo-ctrl .btn{min-width:108px}
+  .pomo-stat{display:flex;gap:14px;align-items:center;justify-content:center;flex-wrap:wrap;font-size:13px;color:var(--sub);margin-top:6px}
+  .pomo-stat b{color:var(--ink);font-size:16px}
+  .pomo-cfg{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin:8px 0}
+  .pomo-cfg label{display:flex;flex-direction:column;font-size:12px;color:var(--sub);gap:4px;text-align:left}
+  .pomo-cfg input{width:100%;border:1px solid var(--line);border-radius:8px;padding:7px 9px;font:inherit}
 </style>
 </head>
 <body>
 <header>
   <h1>考研备考台</h1>
   <div class="meta"><span id="hdr-meta">考试倒计时 · 加载中…</span> <span id="sync-status">💾 本地模式</span></div>
+  <div class="cd-live" id="hdr-countdown">距考研 —天 --:--:--</div>
 </header>
 
 <div id="offline-bar" class="offbar hidden">📴 离线模式：当前改动已保存在本机，联网后会自动同步到所有设备。</div>
@@ -221,6 +246,13 @@
 <div class="wrap">
   <!-- 今日任务 -->
   <section class="tab on" id="tab-today">
+    <div class="card countdown-hero" id="cd-hero">
+      <div class="cd-top"><b>📅 考研倒计时</b> <span class="muted" id="cd-date"></span></div>
+      <div class="cd-num"><span id="cd-days">0</span><i>天</i></div>
+      <div class="cd-hms" id="cd-hms">00:00:00</div>
+      <div class="cd-bar" id="cd-phase"></div>
+      <div class="cd-actions"><button class="btn sm ghost" id="cd-set">设置目标日期</button></div>
+    </div>
     <div class="card">
       <div class="row"><h2><span class="dot" style="background:#9b6bd6"></span>快速添加任务</h2></div>
       <div class="row" style="gap:8px">
@@ -642,10 +674,42 @@
       <div class="pdf-list" id="pdf-list"><div class="pdf-empty">暂无 PDF，先上传一份试试吧</div></div>
     </div>
   </section>
+
+  <!-- 番茄专注 -->
+  <section class="tab" id="tab-focus">
+    <div class="card pomo-card">
+      <div class="row"><h2><span class="dot" style="background:var(--accent)"></span>番茄专注</h2>
+        <span class="pill" id="pomo-mode">🍅 专注</span></div>
+      <div class="pomo-wrap">
+        <div class="pomo-ring" id="pomo-ring"><div class="pomo-inner"><span class="pomo-time" id="pomo-time">25:00</span></div></div>
+      </div>
+      <div class="pomo-ctrl">
+        <button class="btn" id="pomo-toggle">▶ 开始</button>
+        <button class="btn ghost" id="pomo-reset">↺ 重置</button>
+      </div>
+      <div class="pomo-stat">
+        <div>累计完成 <b id="pomo-done">0</b> 个番茄</div>
+        <div>本轮 <b id="pomo-round">0 / 4</b></div>
+        <button class="btn sm ghost" id="pomo-cleardone">清空计数</button>
+      </div>
+    </div>
+
+    <div class="card">
+      <div class="row"><h2>⚙️ 时长设置</h2></div>
+      <div class="pomo-cfg">
+        <label>专注（分钟）<input type="number" min="1" max="120" id="pomo-focus" value="25"></label>
+        <label>短休息（分钟）<input type="number" min="1" max="60" id="pomo-short" value="5"></label>
+        <label>长休息（分钟）<input type="number" min="1" max="60" id="pomo-long" value="15"></label>
+        <label>长休息间隔（轮）<input type="number" min="2" max="12" id="pomo-rounds" value="4"></label>
+      </div>
+      <div class="muted">每完成「长休息间隔」个专注，自动进入一次长休息。专注结束会自动切换到休息并继续计时，休息结束自动回到专注。</div>
+    </div>
+  </section>
 </div>
 
 <nav>
   <a href="#" class="on" data-tab="today"><span class="ic">📋</span>今日</a>
+  <a href="#" data-tab="focus"><span class="ic">🍅</span>专注</a>
   <a href="#" data-tab="review"><span class="ic">🃏</span>巩固</a>
   <a href="#" data-tab="exam"><span class="ic">📝</span>模考</a>
   <a href="#" data-tab="week"><span class="ic">🗓️</span>周计划</a>
@@ -666,7 +730,7 @@ const KEY = "kaoyan_desk_v3";
 const SUBJ = { "408":"408","英1":"英语一","数1":"数学一","政":"政治","雅思":"雅思(IELTS)","软设":"软件设计师(中级)" };
 const MOODS = [["😀","状态好"],["🙂","还行"],["😐","一般"],["😟","疲惫"],["😫","崩溃"]];
 const DATABASE_ID = "sTbMez7pisPbkE0KhikPHl";
-const CHUNKS = ["meta","settings","checkins","notes","custom","plan_adj","cards","mistakes","exams","pdfs"];
+const CHUNKS = ["meta","settings","checkins","notes","custom","plan_adj","cards","mistakes","exams","pdfs","pomo"];
 const PLAN_SCHEMA = 4;  // 计划结构版本：变更 TEMPLATE/ROADMAP/SUBJ 或生成逻辑(缺口驱动/顺延)后自增 → 触发每周计划本地重建
 
 const ROADMAP = {
@@ -731,6 +795,7 @@ function load(){
     if(!o.mistakes) o.mistakes=[];
     if(!o.exams) o.exams=[];
     if(!o.pdfs) o.pdfs=[];
+    if(!o.pomo) o.pomo={focus:25, short:5, long:15, rounds:4, done:0};
     if(!o.remind) o.remind={notify:false, auto:false};
     if(o.planSchema!==PLAN_SCHEMA){ o.plan={weekly:{}}; o.planSchema=PLAN_SCHEMA; }  // 计划结构变了 → 本地重建周计划
     return o; } } }catch(e){}
@@ -761,6 +826,7 @@ function defaultState(){
     mistakes:[],
     exams:[],
     pdfs:[],
+    pomo:{focus:25, short:5, long:15, rounds:4, done:0},
     remind:{notify:false, auto:false},
     certs:{ielts:false, csp:false, lanqiao:false, modeling:false, ruankao:false, pat:false, research:false},
     targets:{score:Object.assign({},DEFAULT_TARGETS.score), selfTest:Object.assign({},DEFAULT_TARGETS.selfTest)},
@@ -1424,11 +1490,105 @@ function renderHeader(){
   const left=daysBetween(todayISO(), S.settings.examDate);
   document.getElementById("hdr-meta").textContent=
     "距 "+S.settings.examDate+" 考试还有 "+left+" 天 · "+getPhase(todayISO()).name+"期 · 连续打卡 "+streak()+" 天";
+  paintCountdown();
+}
+
+/* ============ 番茄专注 & 倒计时 ============ */
+function examRemaining(){
+  let ex; try{ ex=parseD(S.settings.examDate); }catch(e){ ex=new Date(NaN); }
+  if(isNaN(ex.getTime())) return null;
+  ex.setHours(0,0,0,0);
+  let ms=ex.getTime()-Date.now(); if(ms<0) ms=0;
+  const s=Math.floor(ms/1000);
+  return { days:Math.floor(s/86400), h:Math.floor((s%86400)/3600), m:Math.floor((s%3600)/60), sec:s%60 };
+}
+function fmt2(n){ return (n<10?"0":"")+n; }
+function paintCountdown(){
+  const r=examRemaining();
+  const cd=document.getElementById("hdr-countdown");
+  const hero=document.getElementById("cd-hero");
+  if(r===null){
+    if(cd) cd.textContent="未设置考试日期（去设置页填写）";
+    if(hero){ hero.querySelector("#cd-days").textContent="—"; hero.querySelector("#cd-hms").textContent="--:--:--"; }
+    return;
+  }
+  if(cd) cd.textContent="距考研 "+r.days+"天 "+fmt2(r.h)+":"+fmt2(r.m)+":"+fmt2(r.sec);
+  if(hero){
+    hero.querySelector("#cd-days").textContent=r.days;
+    hero.querySelector("#cd-hms").textContent=fmt2(r.h)+":"+fmt2(r.m)+":"+fmt2(r.sec);
+    const dt=document.getElementById("cd-date"); if(dt) dt.textContent=S.settings.examDate;
+    const ph=document.getElementById("cd-phase"); if(ph) ph.textContent=getPhase(todayISO()).name+"期 · 距考试 "+r.days+" 天";
+  }
+}
+let _cdTimer=null;
+function startCountdown(){ paintCountdown(); if(_cdTimer) clearInterval(_cdTimer); _cdTimer=setInterval(paintCountdown,1000); }
+
+const POMO={ mode:"focus", remaining:25*60, running:false, round:0, ticker:null };
+function pomoCfg(){ S.pomo=S.pomo||{focus:25,short:5,long:15,rounds:4,done:0}; return S.pomo; }
+function pomoDurations(){ const c=pomoCfg(); return { focus:c.focus*60, short:c.short*60, long:c.long*60 }; }
+function pomoModeLabel(m){ return m==="focus"?"🍅 专注":(m==="short"?"☕ 短休息":"😴 长休息"); }
+function pomoModeColor(m){ return m==="focus"?"var(--accent)":(m==="short"?"var(--ok)":"#9b6bd6"); }
+function pomoSetMode(m, autostart){
+  POMO.mode=m; POMO.remaining=pomoDurations()[m];
+  if(autostart) pomoStart();
+  else { POMO.running=false; if(POMO.ticker){ clearInterval(POMO.ticker); POMO.ticker=null; } renderPomo(); }
+}
+function pomoStart(){ if(POMO.running) return; POMO.running=true; if(POMO.ticker) clearInterval(POMO.ticker); POMO.ticker=setInterval(pomoTick,1000); renderPomo(); }
+function pomoPause(){ POMO.running=false; if(POMO.ticker){ clearInterval(POMO.ticker); POMO.ticker=null; } renderPomo(); document.title="考研备考台"; }
+function pomoReset(){ POMO.running=false; if(POMO.ticker){ clearInterval(POMO.ticker); POMO.ticker=null; } POMO.mode="focus"; POMO.remaining=pomoDurations().focus; POMO.round=0; renderPomo(); document.title="考研备考台"; }
+function pomoTick(){
+  POMO.remaining--;
+  if(POMO.remaining<=0){ pomoPhaseEnd(); return; }
+  renderPomoTime(); updateTitle();
+}
+function pomoPhaseEnd(){
+  pomoBeep();
+  const c=pomoCfg();
+  if(POMO.mode==="focus"){
+    c.done=(c.done||0)+1; save(); scheduleSync("pomo");
+    POMO.round++;
+    const next=(POMO.round % c.rounds===0)?"long":"short";
+    pomoSetMode(next, true);
+    if(notifySupported() && Notification.permission==="granted"){ try{ new Notification("专注完成 🍅",{body:"已累计 "+c.done+" 个番茄，开始"+(next==="long"?"长":"短")+"休息"}); }catch(e){} }
+  } else {
+    pomoSetMode("focus", true);
+    if(notifySupported() && Notification.permission==="granted"){ try{ new Notification("休息结束",{body:"开始新一轮专注 🍅"}); }catch(e){} }
+  }
+}
+function pomoBeep(){ try{ const AC=window.AudioContext||window.webkitAudioContext; if(!AC) return; const ac=new AC(); const o=ac.createOscillator(); const g=ac.createGain(); o.connect(g); g.connect(ac.destination); o.frequency.value=880; g.gain.value=0.06; o.start(); setTimeout(function(){ try{o.stop();}catch(e){} },200); }catch(e){} }
+function updateTitle(){ document.title=fmt2(Math.floor(POMO.remaining/60))+":"+fmt2(POMO.remaining%60)+" · 考研备考台"; }
+function renderPomoTime(){ const t=document.getElementById("pomo-time"); if(t) t.textContent=fmt2(Math.floor(POMO.remaining/60))+":"+fmt2(POMO.remaining%60); }
+function renderPomo(){
+  const t=document.getElementById("pomo-time"); if(t) t.textContent=fmt2(Math.floor(POMO.remaining/60))+":"+fmt2(POMO.remaining%60);
+  const modeEl=document.getElementById("pomo-mode"); if(modeEl){ modeEl.textContent=pomoModeLabel(POMO.mode); modeEl.style.color=pomoModeColor(POMO.mode); }
+  const ring=document.getElementById("pomo-ring"); if(ring){ const durs=pomoDurations(); const total=durs[POMO.mode]; const frac=Math.max(0,Math.min(1,POMO.remaining/total)); ring.style.background="conic-gradient("+pomoModeColor(POMO.mode)+" "+(frac*360)+"deg, #eef1f7 0deg)"; }
+  const btn=document.getElementById("pomo-toggle"); if(btn) btn.textContent=POMO.running?"⏸ 暂停":"▶ 开始";
+  const done=document.getElementById("pomo-done"); if(done) done.textContent=(pomoCfg().done||0);
+  const round=document.getElementById("pomo-round"); if(round) round.textContent=(POMO.round % pomoCfg().rounds)+" / "+pomoCfg().rounds;
+  const f=document.getElementById("pomo-focus"); if(f && document.activeElement!==f) f.value=pomoCfg().focus;
+  const sh=document.getElementById("pomo-short"); if(sh && document.activeElement!==sh) sh.value=pomoCfg().short;
+  const lo=document.getElementById("pomo-long"); if(lo && document.activeElement!==lo) lo.value=pomoCfg().long;
+  const ro=document.getElementById("pomo-rounds"); if(ro && document.activeElement!==ro) ro.value=pomoCfg().rounds;
+}
+function initPomo(){ POMO.remaining=pomoDurations().focus; renderPomo(); }
+function bindPomo(){
+  const t=document.getElementById("pomo-toggle"); if(t) t.onclick=function(){ POMO.running?pomoPause():pomoStart(); };
+  const r=document.getElementById("pomo-reset"); if(r) r.onclick=pomoReset;
+  const cl=document.getElementById("pomo-cleardone"); if(cl) cl.onclick=function(){ if(confirm("清空累计番茄计数？")){ pomoCfg().done=0; save(); scheduleSync("pomo"); renderPomo(); } };
+  ["focus","short","long","rounds"].forEach(function(k){
+    const el=document.getElementById("pomo-"+k); if(!el) return;
+    el.onchange=function(){
+      const c=pomoCfg(); const def=(k==="rounds")?4:25; const v=Math.max(1, parseInt(el.value)||def);
+      c[k]=v; el.value=v; save(); scheduleSync("pomo");
+      if(!POMO.running){ POMO.remaining=pomoDurations()[POMO.mode]; renderPomo(); }
+    };
+  });
+  const setBtn=document.getElementById("cd-set"); if(setBtn) setBtn.onclick=function(){ switchTab("set"); };
 }
 
 /* ============ tab 切换 ============ */
 function switchTab(name){
-  ["today","review","exam","week","report","viz","gap","pdf","set"].forEach(function(t){
+  ["today","focus","review","exam","week","report","viz","gap","pdf","set"].forEach(function(t){
     document.getElementById("tab-"+t).classList.toggle("on", t===name);
   });
   document.querySelectorAll("nav a").forEach(function(a){ a.classList.toggle("on", a.dataset.tab===name); });
@@ -1440,6 +1600,7 @@ function switchTab(name){
   if(name==="review") renderReview("card");
   if(name==="exam") renderExam();
   if(name==="pdf") renderPdf();
+  if(name==="focus") renderPomo();
 }
 
 /* ============ 设置 & 同步 ============ */
@@ -1499,16 +1660,16 @@ function importData(file){
   const rd=new FileReader();
   rd.onload=function(){ try{ const o=JSON.parse(rd.result);
     if(o&&o.settings&&o.checkins){ S=o; if(!S.plan)S.plan={weekly:{}}; if(!S.certs)S.certs={}; if(!S.notes)S.notes={}; if(!S.custom)S.custom={}; if(!S.cards)S.cards=[]; if(!S.mistakes)S.mistakes=[]; if(!S.exams)S.exams=[]; if(!S.pdfs)S.pdfs=[]; if(!S.remind)S.remind={notify:false,auto:false};
-      save(); renderAll(); toast("已恢复备份"); scheduleSync("checkins"); scheduleSync("notes"); scheduleSync("custom"); scheduleSync("settings"); scheduleSync("plan_adj"); scheduleSync("cards"); scheduleSync("mistakes"); scheduleSync("exams"); scheduleSync("pdfs"); } else toast("文件格式不对"); }catch(e){ toast("解析失败"); } };
+      save(); renderAll(); toast("已恢复备份"); scheduleSync("checkins"); scheduleSync("notes"); scheduleSync("custom"); scheduleSync("settings"); scheduleSync("plan_adj"); scheduleSync("cards"); scheduleSync("mistakes"); scheduleSync("exams"); scheduleSync("pdfs"); scheduleSync("pomo"); } else toast("文件格式不对"); }catch(e){ toast("解析失败"); } };
   rd.readAsText(file);
 }
 function clearSample(){
   if(!confirm("确定清空所有打卡/笔记数据（仅保留设置与背景）？此操作不可撤销。")) return;
   try{ localStorage.removeItem("desk_recids"); }catch(e){}
   S={settings:S.settings, background:S.background, certs:S.certs, targets:S.targets, remind:S.remind||{notify:false,auto:false},
-     cards:S.cards||[], mistakes:S.mistakes||[], exams:S.exams||[], pdfs:S.pdfs||[], plan:{weekly:{}}, custom:{}, version:3, seeded:false};
+     cards:S.cards||[], mistakes:S.mistakes||[], exams:S.exams||[], pdfs:S.pdfs||[], pomo:S.pomo||{focus:25,short:5,long:15,rounds:4,done:0}, plan:{weekly:{}}, custom:{}, version:3, seeded:false};
   save(); renderAll(); toast("已清空打卡数据（卡片/错题/模考/PDF 已保留）");
-  scheduleSync("checkins"); scheduleSync("notes"); scheduleSync("custom"); scheduleSync("settings"); scheduleSync("plan_adj"); scheduleSync("cards"); scheduleSync("mistakes"); scheduleSync("exams"); scheduleSync("pdfs");
+  scheduleSync("checkins"); scheduleSync("notes"); scheduleSync("custom"); scheduleSync("settings"); scheduleSync("plan_adj"); scheduleSync("cards"); scheduleSync("mistakes"); scheduleSync("exams"); scheduleSync("pdfs"); scheduleSync("pomo");
 }
 
 /* ============ 云端同步引擎 ============ */
@@ -1537,6 +1698,7 @@ function chunkOf(name){
   if(name==="mistakes") return S.mistakes||[];
   if(name==="exams") return S.exams||[];
   if(name==="pdfs") return S.pdfs||[];
+  if(name==="pomo") return S.pomo||{};
   return {};
 }
 function applyChunk(name,obj){
@@ -1556,6 +1718,7 @@ function applyChunk(name,obj){
   else if(name==="mistakes"){ S.mistakes=obj||[]; }
   else if(name==="exams"){ S.exams=obj||[]; }
   else if(name==="pdfs"){ if(Array.isArray(obj)) S.pdfs=obj; }
+  else if(name==="pomo"){ if(obj && typeof obj==="object") S.pomo=obj; }
 }
 function pushOne(name,obj){
   const full={ "value":{text:JSON.stringify(obj)}, "rev":{number:REV}, "updatedAt":{date:nowISO()}, "clientId":{text:DEVICE_ID} };
@@ -1817,6 +1980,7 @@ function boot(){
   initSW().then(function(){ if(S.remind && S.remind.notify){ scheduleReminders(); } });
   beLogin();   // 自托管后端：拉取共享状态 + 准备订阅
   if(S.remind && S.remind.auto && notifySupported() && Notification.permission==="granted"){ sendTodayReminder(); }
+  initPomo(); bindPomo(); startCountdown();
 }
 function startSync(){
   if(_pollTimer) clearInterval(_pollTimer);
