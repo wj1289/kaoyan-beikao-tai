@@ -1,8 +1,8 @@
 {
   "name": "kaoyan-beikao-tai",
-  "version": "6.5.0",
+  "version": "6.6.0",
   "private": true,
-  "description": "考研备考台 — 自托管推送后端 + PWA 套件 + PDF 背书记（支持 Render / Railway 一键部署）",
+  "description": "考研备考台 — 自托管推送后端 + PWA 套件 + PDF 背书记 + 个人工作台（支持 Render / Railway 一键部署）",
   "scripts": {
     "start": "node server/index.js",
     "build": "cd server && npm install",
