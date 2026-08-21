@@ -4,11 +4,11 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
 <meta name="theme-color" content="#5b8def">
+<link rel="manifest" href="manifest.webmanifest">
 <meta name="mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="default">
 <meta name="apple-mobile-web-app-title" content="考研备考台">
-<link rel="manifest" href="manifest.webmanifest">
 <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'><rect width='64' height='64' rx='14' fill='%235b8def'/><text x='32' y='45' font-size='38' text-anchor='middle' fill='white' font-family='sans-serif'>研</text></svg>">
 <link rel="apple-touch-icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'><rect width='64' height='64' rx='14' fill='%235b8def'/><text x='32' y='45' font-size='38' text-anchor='middle' fill='white' font-family='sans-serif'>研</text></svg>">
 <title>考研备考台 · 四科一体化（多端同步）</title>
@@ -312,6 +312,21 @@
   .kb-act .inp{width:100%;margin-top:6px}
   .kb-practice{background:#fafbff;border:1px solid var(--line);border-radius:10px;padding:10px;margin-top:8px}
   .kb-q-t{margin-top:6px;line-height:1.55}
+  /* —— 真题库（可编辑） —— */
+  .kbq{background:#fff;border:1px solid var(--line);border-radius:12px;padding:10px;margin-bottom:8px}
+  .kbq-head{display:flex;justify-content:space-between;align-items:center;gap:8px;margin-bottom:4px}
+  .kbq-tag{font-size:12px;color:var(--sub);font-weight:600}
+  .kbq-badge{font-size:11px;color:#b07a2b;background:#fff6e6;border:1px solid #f0d9a8;border-radius:10px;padding:1px 7px;white-space:nowrap}
+  .kbq-q{line-height:1.55;cursor:pointer;padding:4px 0}
+  .kbq-ans{background:#fafbff;border:1px dashed var(--line);border-radius:10px;padding:8px;margin-top:6px;line-height:1.6;white-space:pre-wrap;word-break:break-word}
+  .kbq-acts{display:flex;flex-wrap:wrap;gap:6px;margin-top:8px}
+  .kbq-acts .btn{flex:1 1 auto;min-width:84px}
+  .kb-guide{padding-left:18px;margin:6px 0;line-height:1.75}
+  .kb-guide li{margin-bottom:6px}
+  .kb-modal-mask{position:fixed;inset:0;background:rgba(0,0,0,.42);z-index:50;display:none;align-items:flex-end;justify-content:center}
+  .kb-modal-mask.show{display:flex}
+  .kb-modal{background:#fff;width:100%;max-width:520px;border-radius:16px 16px 0 0;padding:16px;max-height:88vh;overflow:auto}
+  @media(min-width:520px){ .kb-modal-mask{align-items:center} .kb-modal{border-radius:16px} }
   @media(max-width:560px){ .kb-entries{grid-template-columns:1fr} .kb-overview{grid-template-columns:repeat(2,1fr)} }
 </style>
 </head>
@@ -796,7 +811,6 @@
       <button data-wb="cal">📅 日程</button>
       <button data-wb="note">📝 笔记</button>
       <button data-wb="fav">🔖 书签</button>
-      <button data-wb="kb">🎓 408</button>
     </div>
 
     <!-- 待办清单 -->
@@ -892,80 +906,134 @@
       </div>
     </div>
 
-    <!-- 408 辅导工作台 -->
-    <div id="wb-kb" style="display:none">
-      <!-- 状态概览 -->
-      <div class="kb-overview">
-        <div class="kb-stat"><b id="kb-stat-qa">0</b><span>技能调用</span></div>
-        <div class="kb-stat"><b id="kb-stat-pt">0</b><span>知识点</span></div>
-        <div class="kb-stat"><b id="kb-stat-due">0</b><span>今日待复习</span></div>
-        <div class="kb-stat"><b id="kb-stat-streak">0</b><span>连续天数</span></div>
-      </div>
-      <div class="kb-mastery" id="kb-mastery"></div>
+    <!-- 408 内容已移至独立标签页 #tab-kb408 -->
+  </section>
 
-      <!-- 功能入口 -->
-      <div class="card">
-        <h2>🎯 技能功能入口</h2>
-        <div class="muted" style="margin-bottom:8px">点「调用技能」会复制规范提示词，去新对话粘贴给 408 专家即可执行（结果可回填归档）。</div>
-        <div class="kb-entries">
-          <div class="kb-entry">
-            <div class="kb-entry-h">🗣️ 费曼答疑</div>
-            <div class="muted">用自己的话讲 → 补漏 → 真题演练</div>
-            <input class="inp" id="kb-qa-q" placeholder="输入问题，如：简述 TCP 三次握手">
-            <button class="btn" id="kb-qa-go">调用技能（复制提示词）</button>
-          </div>
-          <div class="kb-entry">
-            <div class="kb-entry-h">🗺️ 知识索引</div>
-            <div class="muted">科目→章节→知识点→掌握度</div>
-            <input class="inp" id="kb-idx-focus" placeholder="本次关注考点（可选）">
-            <button class="btn" id="kb-idx-go">调用技能（复制提示词）</button>
-          </div>
-          <div class="kb-entry">
-            <div class="kb-entry-h">📊 定期归纳</div>
-            <div class="muted">聚类·关系图·薄弱点·复习表</div>
-            <button class="btn" id="kb-sum-go">调用技能（复制提示词）</button>
-          </div>
-          <div class="kb-entry">
-            <div class="kb-entry-h">⏰ 复习提醒</div>
-            <div class="muted">按艾宾浩斯列出今日待复习</div>
-            <button class="btn" id="kb-rem-go">调用技能（复制提示词）</button>
-          </div>
+  <!-- ============ 408 工作台（独立标签页） ============ -->
+  <section class="tab" id="tab-kb408">
+    <!-- 状态概览 -->
+    <div class="kb-overview">
+      <div class="kb-stat"><b id="kb-stat-qa">0</b><span>技能调用</span></div>
+      <div class="kb-stat"><b id="kb-stat-pt">0</b><span>知识点</span></div>
+      <div class="kb-stat"><b id="kb-stat-due">0</b><span>今日待复习</span></div>
+      <div class="kb-stat"><b id="kb-stat-streak">0</b><span>连续天数</span></div>
+    </div>
+    <div class="kb-mastery" id="kb-mastery"></div>
+
+    <!-- 真题库（可编辑） -->
+    <div class="card">
+      <h2>📚 真题库 <span class="muted" style="font-weight:400">（可增删改 · 移动端点题展开答案）</span></h2>
+      <div class="wb-tools">
+        <input class="inp" id="kb-bank-search" placeholder="🔍 搜索题目 / 章节 / 答案关键词…">
+        <select class="sel" id="kb-bank-subj">
+          <option value="">全部科目</option>
+        </select>
+      </div>
+      <div class="wb-tools" style="margin-top:6px">
+        <button class="btn" id="kb-bank-add">＋ 添加题目</button>
+        <button class="btn ghost" id="kb-bank-restore">♻️ 恢复内置真题</button>
+        <span class="muted" id="kb-bank-count" style="margin-left:auto"></span>
+      </div>
+      <div id="kb-bank-list" style="margin-top:8px"></div>
+    </div>
+
+    <!-- 快捷操作 -->
+    <div class="card">
+      <h2>⚡ 快捷操作</h2>
+      <div class="wb-tools">
+        <select class="sel" id="kb-pt-subj"></select>
+        <input class="inp" id="kb-pt-chapter" placeholder="章节，如：第5章 树与二叉树">
+      </div>
+      <div class="wb-tools">
+        <input class="inp" id="kb-pt-name" placeholder="知识点，如：二叉树遍历">
+        <select class="sel" id="kb-pt-mastery">
+          <option value="green">🟢 熟练</option>
+          <option value="yellow" selected>🟡 一般</option>
+          <option value="red">🔴 薄弱</option>
+        </select>
+        <button class="btn" id="kb-pt-add">＋ 记录知识点</button>
+      </div>
+      <div class="row" style="margin-top:8px">
+        <button class="btn sm" id="kb-practice">🎲 抽一道真题</button>
+        <button class="btn sm ghost" id="kb-review-all">✅ 标记今日复习完成</button>
+      </div>
+      <div id="kb-practice-box" class="kb-practice" style="display:none"></div>
+    </div>
+
+    <!-- 功能入口 -->
+    <div class="card">
+      <h2>🎯 技能功能入口</h2>
+      <div class="muted" style="margin-bottom:8px">点「调用技能」会复制规范提示词，去新对话粘贴给 408 专家即可执行（结果可回填归档）。</div>
+      <div class="kb-entries">
+        <div class="kb-entry">
+          <div class="kb-entry-h">🗣️ 费曼答疑</div>
+          <div class="muted">用自己的话讲 → 补漏 → 真题演练</div>
+          <input class="inp" id="kb-qa-q" placeholder="输入问题，如：简述 TCP 三次握手">
+          <button class="btn" id="kb-qa-go">调用技能（复制提示词）</button>
+        </div>
+        <div class="kb-entry">
+          <div class="kb-entry-h">🗺️ 知识索引</div>
+          <div class="muted">科目→章节→知识点→掌握度</div>
+          <input class="inp" id="kb-idx-focus" placeholder="本次关注考点（可选）">
+          <button class="btn" id="kb-idx-go">调用技能（复制提示词）</button>
+        </div>
+        <div class="kb-entry">
+          <div class="kb-entry-h">📊 定期归纳</div>
+          <div class="muted">聚类·关系图·薄弱点·复习表</div>
+          <button class="btn" id="kb-sum-go">调用技能（复制提示词）</button>
+        </div>
+        <div class="kb-entry">
+          <div class="kb-entry-h">⏰ 复习提醒</div>
+          <div class="muted">按艾宾浩斯列出今日待复习</div>
+          <button class="btn" id="kb-rem-go">调用技能（复制提示词）</button>
         </div>
       </div>
+    </div>
 
-      <!-- 快捷操作 -->
-      <div class="card">
-        <h2>⚡ 快捷操作</h2>
+    <!-- 手机端技能调用指南 -->
+    <div class="card">
+      <div class="row" style="align-items:center"><h2>📖 手机端技能调用指南</h2><button class="btn sm ghost" id="kb-guide-btn" style="margin-left:auto">展开明细</button></div>
+      <div class="muted" style="margin-bottom:6px">本台以「本地伴侣」方式工作：点题即可复制规范提示词，去新对话粘贴给 408 专家执行，再把结果回填本题。完整手机操作步骤见「展开明细」。</div>
+      <div id="kb-guide" style="display:none">
+        <ol class="kb-guide">
+          <li>在<b>真题库</b>点任意题的「调用技能解析」→ 提示词自动复制到剪贴板（iOS 会请求授权）。</li>
+          <li>返回 WorkBuddy 主界面，<b>新建对话</b>并在专家列表选择「408 考研专属辅导」专家（或直接 @ 该技能）。</li>
+          <li>粘贴提示词发送，等待 AI 用费曼学习法给出讲解、补漏与标准答法。</li>
+          <li>复制 AI 的解析，回到本题点「保存解析」粘贴进去；下次点<b>「查看答案」</b>即可离线查看，不依赖网络。</li>
+          <li>遇到薄弱点，用上方「快捷操作 · 记录知识点」加入知识索引，按艾宾浩斯曲线复习。</li>
+        </ol>
+        <div class="muted">说明：所有题目与解析仅存于本机（及你开启的资料库同步），不上传模型；内置 8 道真题可随时用「恢复内置真题」重置。</div>
+      </div>
+    </div>
+
+    <!-- 知识索引 -->
+    <div class="card">
+      <h2>🗺️ 知识索引</h2>
+      <div id="kb-index"></div>
+    </div>
+
+    <!-- 近期活动 -->
+    <div class="card">
+      <h2>🕑 近期活动</h2>
+      <div id="kb-activity"></div>
+    </div>
+
+    <!-- 题目编辑弹窗 -->
+    <div class="kb-modal-mask" id="kb-modal-mask">
+      <div class="kb-modal" id="kb-modal">
+        <h3 id="kb-modal-title">添加真题</h3>
         <div class="wb-tools">
-          <select class="sel" id="kb-pt-subj"></select>
-          <input class="inp" id="kb-pt-chapter" placeholder="章节，如：第5章 树与二叉树">
+          <select class="sel" id="kb-q-subj"></select>
         </div>
-        <div class="wb-tools">
-          <input class="inp" id="kb-pt-name" placeholder="知识点，如：二叉树遍历">
-          <select class="sel" id="kb-pt-mastery">
-            <option value="green">🟢 熟练</option>
-            <option value="yellow" selected>🟡 一般</option>
-            <option value="red">🔴 薄弱</option>
-          </select>
-          <button class="btn" id="kb-pt-add">＋ 记录知识点</button>
+        <div class="wb-tools" style="margin-top:8px">
+          <input class="inp" id="kb-q-chapter" placeholder="章节，如：第5章 树与二叉树">
         </div>
-        <div class="row" style="margin-top:8px">
-          <button class="btn sm" id="kb-practice">🎲 抽一道真题</button>
-          <button class="btn sm ghost" id="kb-review-all">✅ 标记今日复习完成</button>
+        <textarea class="inp" id="kb-q-text" rows="3" placeholder="题目内容…" style="margin-top:8px;width:100%"></textarea>
+        <textarea class="inp" id="kb-q-ans" rows="4" placeholder="答案 / 解析（可选；可在技能生成后回填）" style="margin-top:8px;width:100%"></textarea>
+        <div class="row">
+          <button class="btn" id="kb-q-save">保存</button>
+          <button class="btn ghost" id="kb-q-cancel">取消</button>
         </div>
-        <div id="kb-practice-box" class="kb-practice" style="display:none"></div>
-      </div>
-
-      <!-- 知识索引 -->
-      <div class="card">
-        <h2>🗺️ 知识索引</h2>
-        <div id="kb-index"></div>
-      </div>
-
-      <!-- 近期活动 -->
-      <div class="card">
-        <h2>🕑 近期活动</h2>
-        <div id="kb-activity"></div>
       </div>
     </div>
   </section>
@@ -981,6 +1049,7 @@
   <a href="#" data-tab="viz"><span class="ic">📊</span>可视化</a>
   <a href="#" data-tab="gap"><span class="ic">🎯</span>缺口</a>
   <a href="#" data-tab="pdf"><span class="ic">📄</span>PDF背</a>
+  <a href="#" data-tab="kb408"><span class="ic">🎓</span>408</a>
   <a href="#" data-tab="wb"><span class="ic">🗂️</span>工作台</a>
   <a href="#" data-tab="set"><span class="ic">⚙️</span>设置</a>
 </nav>
@@ -1066,7 +1135,8 @@ function load(){
     if(!o.bookmarks) o.bookmarks=[];
     if(!o.bmCats) o.bmCats=["学习","工具","资讯","娱乐","其他"];
     if(typeof o.quick!=="string") o.quick="";
-    if(!o.kb408) o.kb408={points:[],activities:[],qaCount:0};
+    if(!o.kb408) o.kb408={points:[],activities:[],qaCount:0, bank:null};
+    if(!Array.isArray(o.kb408.bank)) o.kb408.bank=null;
     if(!o.remind) o.remind={notify:false, auto:false};
     if(o.planSchema!==PLAN_SCHEMA){ o.plan={weekly:{}}; o.planSchema=PLAN_SCHEMA; }  // 计划结构变了 → 本地重建周计划
     return o; } } }catch(e){}
@@ -1103,7 +1173,7 @@ function defaultState(){
     bookmarks:[],
     bmCats:["学习","工具","资讯","娱乐","其他"],
     quick:"",
-    kb408:{points:[],activities:[],qaCount:0},
+    kb408:{points:[],activities:[],qaCount:0, bank:null},
     remind:{notify:false, auto:false},
     certs:{ielts:false, csp:false, lanqiao:false, modeling:false, ruankao:false, pat:false, research:false},
     targets:{score:Object.assign({},DEFAULT_TARGETS.score), selfTest:Object.assign({},DEFAULT_TARGETS.selfTest)},
@@ -1872,13 +1942,12 @@ let _noteTimer=null;
 function wbUid(){ return Date.now().toString(36)+Math.random().toString(36).slice(2,7); }
 
 function renderWorkbench(){
-  ["todo","cal","note","fav","kb"].forEach(function(s){ document.getElementById("wb-"+s).style.display=(s===WB_SUB)?"block":"none"; });
+  ["todo","cal","note","fav"].forEach(function(s){ document.getElementById("wb-"+s).style.display=(s===WB_SUB)?"block":"none"; });
   document.querySelectorAll("#wb-subnav button").forEach(function(b){ b.classList.toggle("on", b.dataset.wb===WB_SUB); });
   if(WB_SUB==="todo") renderTodos();
   if(WB_SUB==="cal") paintCal();
   if(WB_SUB==="note"){ const ta=document.getElementById("wb-note-area"); if(ta){ ta.value=S.quick||""; document.getElementById("wb-note-count").textContent=(S.quick||"").length+" 字"; document.getElementById("wb-note-saved").textContent="已保存 ✓"; } }
   if(WB_SUB==="fav") renderFav();
-  if(WB_SUB==="kb") renderKb();
 }
 
 /* —— 待办清单 —— */
@@ -2071,7 +2140,6 @@ function bindWorkbench(){
   document.getElementById("wb-fav-add").onclick=addFav;
   document.getElementById("wb-fav-addcat").onclick=addCat;
   bindNote();
-  bindKb();
 }
 
 /* ============ 408 辅导工作台 ============ */
@@ -2087,9 +2155,13 @@ const KB_QBANK = [
   {subj:"CN", chapter:"第5章 传输层", q:"TCP 三次握手建立连接的过程，以及为什么需要三次而不是两次？"},
   {subj:"CN", chapter:"第4章 网络层", q:"简述 IP 子网划分步骤，并计算给定 IP/26 的网络号与可用主机范围。"}
 ];
-function kb(){ if(!S.kb408) S.kb408={points:[],activities:[],qaCount:0};
+function seedKbBank(){ return KB_QBANK.map(function(it,i){ return {id:"bi-"+i, subj:it.subj, chapter:it.chapter, q:it.q, a:"", builtin:true}; }); }
+function kb(){ if(!S.kb408) S.kb408={points:[],activities:[],qaCount:0, bank:null};
   if(!S.kb408.points) S.kb408.points=[]; if(!S.kb408.activities) S.kb408.activities=[];
-  if(typeof S.kb408.qaCount!=="number") S.kb408.qaCount=0; return S.kb408; }
+  if(typeof S.kb408.qaCount!=="number") S.kb408.qaCount=0;
+  if(!Array.isArray(S.kb408.bank)) S.kb408.bank=seedKbBank();
+  return S.kb408; }
+function kbBank(){ return kb().bank || []; }
 function kbSave(){ save(); scheduleSync("kb408"); }
 function kbDueCount(){ const k=kb(), t=todayISO(); return (k.points||[]).filter(function(p){ return p.nextReview && p.nextReview<=t; }).length; }
 function kbStreak(){
@@ -2221,7 +2293,9 @@ function invokeKb(type){
   if(type==="qa" && q) renderKb();
 }
 function kbPractice(){
-  const item=KB_QBANK[Math.floor(Math.random()*KB_QBANK.length)];
+  const bank=kbBank();
+  if(!bank.length){ toast("题库为空，先添加题目"); return; }
+  const item=bank[Math.floor(Math.random()*bank.length)];
   const box=document.getElementById("kb-practice-box");
   box.style.display="block";
   box.innerHTML='<div class="kb-q"><b>🎲 '+SUB408[item.subj]+' · '+esc(item.chapter)+'</b>'
@@ -2270,9 +2344,141 @@ function bindKb(){
   document.getElementById("kb-review-all").onclick=kbReviewAll;
 }
 
+/* ============ 408 工作台（独立标签页） ============ */
+function renderKb408(){ renderKb(); renderKbBank(); }
+
+let _kbBankKW="", _kbBankSubj="";
+function renderKbBank(){
+  const el=document.getElementById("kb-bank-list"); if(!el) return;
+  const kw=(_kbBankKW||"").trim().toLowerCase();
+  const subj=_kbBankSubj||"";
+  const sel=document.getElementById("kb-bank-subj");
+  if(sel && sel.options.length<=1){
+    sel.innerHTML='<option value="">全部科目</option>'+Object.keys(SUB408).map(function(s){return '<option value="'+s+'">'+SUB408[s]+'</option>';}).join("");
+    sel.value=subj;
+  }
+  let arr=kbBank().slice();
+  if(subj) arr=arr.filter(function(it){return it.subj===subj;});
+  if(kw){ arr=arr.filter(function(it){
+    return (it.q||"").toLowerCase().indexOf(kw)>=0
+      || (it.chapter||"").toLowerCase().indexOf(kw)>=0
+      || (it.a||"").toLowerCase().indexOf(kw)>=0
+      || (SUB408[it.subj]||"").toLowerCase().indexOf(kw)>=0;
+  }); }
+  const cnt=document.getElementById("kb-bank-count"); if(cnt) cnt.textContent="共 "+kbBank().length+" 题 · 命中 "+arr.length;
+  if(!arr.length){ el.innerHTML='<div class="pdf-empty">没有匹配的题目，点「＋ 添加题目」新建，或用「恢复内置真题」。</div>'; return; }
+  el.innerHTML=arr.map(function(it){
+    const tag=SUB408[it.subj]||it.subj;
+    const badge=it.builtin?'<span class="kbq-badge">🔒 内置</span>':'<span class="kbq-badge" style="color:#2f93b3;background:#eaf6fb;border-color:#bfe0ec">✏️ 自定义</span>';
+    const ans = it.a ? esc(it.a) : '<span class="muted">暂无解析，点「调用技能解析」生成并保存</span>';
+    return '<div class="kbq" data-id="'+it.id+'">'
+      +'<div class="kbq-head"><span class="kbq-tag">📘 '+esc(tag)+' · '+esc(it.chapter||"")+'</span>'+badge+'</div>'
+      +'<div class="kbq-q" data-act="reveal">'+esc(it.q)+'</div>'
+      +'<div class="kbq-ans" style="display:none">'+ans+'</div>'
+      +'<div class="kbq-acts">'
+      +'<button class="btn sm" data-act="reveal">查看答案</button>'
+      +'<button class="btn sm" data-act="skill">调用技能解析</button>'
+      +'<button class="btn sm ghost" data-act="edit">编辑</button>'
+      +'<button class="btn sm ghost" data-act="del">删除</button>'
+      +'</div></div>';
+  }).join("");
+  el.querySelectorAll(".kbq").forEach(function(card){
+    const id=card.dataset.id;
+    const ansEl=card.querySelector(".kbq-ans");
+    card.querySelectorAll('[data-act="reveal"]').forEach(function(b){ b.onclick=function(e){ e.stopPropagation(); toggleKbAns(card, ansEl); }; });
+    card.querySelector('[data-act="skill"]').onclick=function(){ kbSkillSolve(id); };
+    card.querySelector('[data-act="edit"]').onclick=function(){ openKbQModal(id); };
+    card.querySelector('[data-act="del"]').onclick=function(){ delKbQ(id); };
+  });
+}
+function toggleKbAns(card, ansEl){
+  const hidden = ansEl.style.display==="none";
+  ansEl.style.display = hidden? "block":"none";
+  card.querySelectorAll('button[data-act="reveal"]').forEach(function(b){ b.textContent = hidden? "收起答案":"查看答案"; });
+}
+function kbSkillSolve(id){
+  const it=(kbBank()||[]).filter(function(x){return x.id===id;})[0]; if(!it) return;
+  const prompt="【408·费曼答疑·真题】请就以下题目用费曼法辅导我：\n"+it.q+"\n所属："+SUB408[it.subj]+" "+it.chapter+"\n请先让我讲思路，再补漏并给出标准答法。";
+  kbCopy(prompt);
+  const card=document.querySelector('.kbq[data-id="'+id+'"]');
+  if(card){
+    const ansEl=card.querySelector(".kbq-ans");
+    ansEl.style.display="block";
+    ansEl.innerHTML='<div class="muted" style="margin-bottom:4px">已复制解析提示词。粘贴 AI 的回答并保存：</div>'
+      +'<textarea class="inp kb-ans-edit" rows="3" placeholder="在此粘贴 AI 解析…">'+esc(it.a||"")+'</textarea>'
+      +'<div class="row" style="margin-top:6px"><button class="btn sm" data-act="saveans">💾 保存解析</button>'
+      +'<button class="btn sm ghost" data-act="cancelans">收起</button></div>';
+    card.querySelector('[data-act="saveans"]').onclick=function(){
+      it.a=card.querySelector(".kb-ans-edit").value; kbSave(); addKbActivity("practice","真题解析："+it.q.slice(0,16),"已保存解析。"); renderKbBank(); renderKb(); toast("已保存解析");
+    };
+    card.querySelector('[data-act="cancelans"]').onclick=function(){ ansEl.style.display="none"; };
+  }
+  addKbActivity("practice","真题解析："+it.q.slice(0,16),"提示词已复制，去新对话粘贴给 408 专家执行。");
+  renderKb();
+}
+let _kbEditId=null;
+function openKbQModal(id){
+  _kbEditId=id||null;
+  const subjSel=document.getElementById("kb-q-subj");
+  subjSel.innerHTML=Object.keys(SUB408).map(function(s){return '<option value="'+s+'">'+SUB408[s]+'</option>';}).join("");
+  let it=null;
+  if(id){ it=(kbBank()||[]).filter(function(x){return x.id===id;})[0]; }
+  document.getElementById("kb-modal-title").textContent= it? "编辑真题":"添加真题";
+  subjSel.value = it? it.subj : "DS";
+  document.getElementById("kb-q-chapter").value = it? (it.chapter||"") : "";
+  document.getElementById("kb-q-text").value = it? (it.q||"") : "";
+  document.getElementById("kb-q-ans").value = it? (it.a||"") : "";
+  document.getElementById("kb-modal-mask").classList.add("show");
+}
+function closeKbQModal(){ document.getElementById("kb-modal-mask").classList.remove("show"); }
+function saveKbQ(){
+  const subj=document.getElementById("kb-q-subj").value;
+  const chapter=document.getElementById("kb-q-chapter").value.trim();
+  const q=document.getElementById("kb-q-text").value.trim();
+  const a=document.getElementById("kb-q-ans").value;
+  if(!q){ toast("请填写题目内容"); return; }
+  const bank=kbBank();
+  if(_kbEditId){
+    const it=bank.filter(function(x){return x.id===_kbEditId;})[0];
+    if(it){ it.subj=subj; it.chapter=chapter; it.q=q; it.a=a; }
+  } else {
+    bank.push({id:wbUid(), subj:subj, chapter:chapter, q:q, a:a, builtin:false});
+    addKbActivity("bank","添加真题", (SUB408[subj]||"")+" "+(chapter||""));
+  }
+  kbSave(); closeKbQModal(); renderKbBank(); toast(_kbEditId?"已更新题目":"已添加题目");
+}
+function delKbQ(id){
+  const it=(kbBank()||[]).filter(function(x){return x.id===id;})[0]; if(!it) return;
+  if(it.builtin){ toast("内置真题受保护，可用「恢复内置真题」重置"); return; }
+  if(!confirm("确定删除这道自定义真题？")) return;
+  S.kb408.bank=(kbBank()||[]).filter(function(x){return x.id!==id;});
+  kbSave(); renderKbBank(); toast("已删除");
+}
+function restoreKbBank(){
+  if(!confirm("将恢复 8 道内置真题（已删除的会补回、已改动的会重置为原始），自定义题目不受影响。继续？")) return;
+  const custom=(kbBank()||[]).filter(function(x){return !x.builtin;});
+  seedKbBank().forEach(function(b){ custom.push(b); });
+  S.kb408.bank=custom;
+  kbSave(); renderKbBank(); toast("已恢复内置真题");
+}
+function bindKb408(){
+  const search=document.getElementById("kb-bank-search");
+  if(search) search.oninput=function(){ _kbBankKW=this.value; renderKbBank(); };
+  const subjSel=document.getElementById("kb-bank-subj");
+  if(subjSel) subjSel.onchange=function(){ _kbBankSubj=this.value; renderKbBank(); };
+  const add=document.getElementById("kb-bank-add"); if(add) add.onclick=function(){ openKbQModal(null); };
+  const restore=document.getElementById("kb-bank-restore"); if(restore) restore.onclick=restoreKbBank;
+  const save=document.getElementById("kb-q-save"); if(save) save.onclick=saveKbQ;
+  const cancel=document.getElementById("kb-q-cancel"); if(cancel) cancel.onclick=closeKbQModal;
+  const mask=document.getElementById("kb-modal-mask"); if(mask) mask.onclick=function(e){ if(e.target===mask) closeKbQModal(); };
+  const guideBtn=document.getElementById("kb-guide-btn");
+  if(guideBtn) guideBtn.onclick=function(){ const g=document.getElementById("kb-guide"); const show=g.style.display!=="none"; g.style.display=show?"none":"block"; guideBtn.textContent=show?"展开明细":"收起明细"; };
+  bindKb();
+}
+
 /* ============ tab 切换 ============ */
 function switchTab(name){
-  ["today","focus","review","exam","week","report","viz","gap","pdf","wb","set"].forEach(function(t){
+  ["today","focus","review","exam","week","report","viz","gap","pdf","kb408","wb","set"].forEach(function(t){
     document.getElementById("tab-"+t).classList.toggle("on", t===name);
   });
   document.querySelectorAll("nav a").forEach(function(a){ a.classList.toggle("on", a.dataset.tab===name); });
@@ -2286,6 +2492,7 @@ function switchTab(name){
   if(name==="pdf") renderPdf();
   if(name==="focus") renderPomo();
   if(name==="wb") renderWorkbench();
+  if(name==="kb408") renderKb408();
 }
 
 /* ============ 设置 & 同步 ============ */
@@ -2352,7 +2559,7 @@ function clearSample(){
   if(!confirm("确定清空所有打卡/笔记数据（仅保留设置与背景）？此操作不可撤销。")) return;
   try{ localStorage.removeItem("desk_recids"); }catch(e){}
   S={settings:S.settings, background:S.background, certs:S.certs, targets:S.targets, remind:S.remind||{notify:false,auto:false},
-     cards:S.cards||[], mistakes:S.mistakes||[], exams:S.exams||[], pdfs:S.pdfs||[], pomo:S.pomo||{focus:25,short:5,long:15,rounds:4,done:0}, todos:S.todos||[], events:S.events||[], bookmarks:S.bookmarks||[], bmCats:S.bmCats||["学习","工具","资讯","娱乐","其他"], quick:S.quick||"", kb408:S.kb408||{points:[],activities:[],qaCount:0}, plan:{weekly:{}}, custom:{}, version:3, seeded:false};
+     cards:S.cards||[], mistakes:S.mistakes||[], exams:S.exams||[], pdfs:S.pdfs||[], pomo:S.pomo||{focus:25,short:5,long:15,rounds:4,done:0}, todos:S.todos||[], events:S.events||[], bookmarks:S.bookmarks||[], bmCats:S.bmCats||["学习","工具","资讯","娱乐","其他"], quick:S.quick||"", kb408:S.kb408||{points:[],activities:[],qaCount:0, bank:null}, plan:{weekly:{}}, custom:{}, version:3, seeded:false};
   save(); renderAll(); toast("已清空打卡数据（卡片/错题/模考/PDF/工作台已保留）");
   scheduleSync("checkins"); scheduleSync("notes"); scheduleSync("custom"); scheduleSync("settings"); scheduleSync("plan_adj"); scheduleSync("cards"); scheduleSync("mistakes"); scheduleSync("exams"); scheduleSync("pdfs"); scheduleSync("pomo"); scheduleSync("todos"); scheduleSync("events"); scheduleSync("fav"); scheduleSync("quick"); scheduleSync("kb408");
 }
@@ -2677,6 +2884,7 @@ function boot(){
   if(S.remind && S.remind.auto && notifySupported() && Notification.permission==="granted"){ sendTodayReminder(); }
   initPomo(); bindPomo(); startCountdown();
   bindWorkbench();
+  bindKb408();
 }
 function startSync(){
   if(_pollTimer) clearInterval(_pollTimer);
