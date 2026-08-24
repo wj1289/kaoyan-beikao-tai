@@ -68,6 +68,8 @@ cd server && npm install && node index.js
 
 部署后访问 `https://<你的域名>/` 即可使用；在手机 / 电脑授权推送后，关闭网页也按时收到含答案的复习提醒。
 
+> **零配置跨设备同步**：自托管域名（非 `workbuddy.link`）下，前端会自动从后端 `/api/vapid` 拉取公钥并启用整状态同步（`/api/sync`，LWW 合并）。打开任意设备即自动拉取共享状态，保存即上传——无需手动填任何密钥。注意：资料库 SDK 通道（WorkBuddy 内打开）与自建后端通道各自独立，互不影响。
+
 ## 🔔 跨设备推送原理
 
 - 前端在授权后通过 `pushManager.subscribe` 上报订阅到后端 `/api/subscribe`。

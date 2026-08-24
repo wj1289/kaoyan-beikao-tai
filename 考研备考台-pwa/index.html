@@ -2826,7 +2826,7 @@ if("serviceWorker" in navigator){
 const PUSH_VAPID_PUBLIC_KEY = "";   // ← 部署时填入后端 gen-vapid.js 生成的 VAPID 公钥
 const BE_WS = "default";            // 共享工作区名（多人多端共用同一同步源；个人用 default 即可）
 let _BE_URL = "";                   // 后端地址：部署时改为 "" 自动取同源，或显式填 "https://your-domain.com"
-function beEnabled(){ return pwaSelfHost() && !!PUSH_VAPID_PUBLIC_KEY; }
+function beEnabled(){ return pwaSelfHost() && !!(PUSH_VAPID_PUBLIC_KEY || PUSH_VAPID_PUBLIC_KEY_LOCAL); }
 function beBase(){ return _BE_URL || ""; }
 let _beSaveTimer=null, _beSub=null, _beReg=null;
 async function beLogin(){
@@ -2836,7 +2836,13 @@ async function beLogin(){
 }
 let PUSH_VAPID_PUBLIC_KEY_LOCAL="";
 function bePushState(){
-  if(!beEnabled()) return;
+  if(!beEnabled()){
+    // 自托管域名但公钥尚未就绪：先拉取 /api/vapid 再尝试上传（自愈启动瞬间的边界情况）
+    if(pwaSelfHost() && _BE_URL===""){
+      try{ fetch(beBase()+"api/vapid",{cache:"no-store"}).then(function(r){return r.ok?r.json():null;}).then(function(j){ if(j&&j.publicKey){ PUSH_VAPID_PUBLIC_KEY_LOCAL=j.publicKey; if(beEnabled()) bePushState(); } }).catch(function(){}); }catch(e){}
+    }
+    return;
+  }
   if(_beSaveTimer) clearTimeout(_beSaveTimer);
   _beSaveTimer=setTimeout(function(){
     try{ fetch(beBase()+"api/sync",{method:"POST",headers:{"Content-Type":"application/json"},
