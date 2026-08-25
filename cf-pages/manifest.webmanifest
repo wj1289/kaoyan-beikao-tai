@@ -1,0 +1,16 @@
+{
+  "id": "/kaoyan-desk/",
+  "name": "考研备考台",
+  "short_name": "备考台",
+  "description": "考研（408/英一/数一/政/雅思/软设）一体化备考工作台，支持艾宾浩斯遗忘曲线复习与 Service Worker 后台提醒",
+  "start_url": "./",
+  "scope": "./",
+  "display": "standalone",
+  "orientation": "portrait",
+  "background_color": "#f4f6fb",
+  "theme_color": "#5b8def",
+  "categories": ["education", "productivity"],
+  "icons": [
+    { "src": "icon.svg", "sizes": "any", "type": "image/svg+xml", "purpose": "any maskable" }
+  ]
+}

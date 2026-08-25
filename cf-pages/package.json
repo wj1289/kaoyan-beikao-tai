@@ -1,0 +1,6 @@
+{
+  "name": "kaoyan-beikao-tai-cf-pages",
+  "version": "6.8.2",
+  "private": true,
+  "description": "考研备考台 Cloudflare Pages 版：静态页面 + Functions + KV 跨设备同步（无 npm 依赖）"
+}
